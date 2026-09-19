@@ -1,0 +1,82 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Production builds and generated files
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Environment files (keep example templates versioned)
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Vite and tooling caches
+.vite/
+.cache/
+.parcel-cache/
+.turbo/
+.eslintcache
+*.cache
+
+# Test and report output
+playwright-report/
+test-results/
+blob-report/
+*.lcov
+
+# Local editor and IDE settings
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Operating-system files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+Desktop.ini
+
+# Temporary files and local backups
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+
+# Package manager files
+.npm/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnpm-store/
+
+# Local certificates and secrets
+*.pem
+*.key
+*.crt

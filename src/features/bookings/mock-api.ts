@@ -1,0 +1,8 @@
+/** Replace MockApi with a PHP/MySQL HTTP client; its methods are the client contract. */
+export type ApiSeatState='available'|'held'|'unavailable';
+export type ApiTrip={id:string;origin:string;destination:string;departureAt:string;pickupPointId:string;fareUgx:number;availableSeats:number};
+export type SeatHold={id:string;tripId:string;seat:string;expiresAt:string};
+export type ApiTicket={bookingId:string;reference:string;ticketSignature:string;qrPayload:string};
+export class SeatConflictError extends Error {status=409; constructor(){super('This seat is no longer available')}}
+export interface PassengerApi {searchTrips(origin:string,destination:string,date:string):Promise<ApiTrip[]>;holdSeat(tripId:string,seat:string):Promise<SeatHold>;releaseSeat(holdId:string):Promise<void>;createBooking(holdId:string,passenger:{name:string;phone:string}):Promise<{bookingId:string}>;getTicket(bookingId:string):Promise<ApiTicket>}
+export class MockPassengerApi implements PassengerApi {private held=new Set<string>();async searchTrips(origin:string,destination:string,date:string){return [{id:'ex-701',origin,destination,departureAt:`${date}T07:15:00+03:00`,pickupPointId:'entebbe-road',fareUgx:12000,availableSeats:14}]};async holdSeat(tripId:string,seat:string){const key=`${tripId}:${seat}`;if(this.held.has(key))throw new SeatConflictError();this.held.add(key);return{id:`hold-${seat}`,tripId,seat,expiresAt:new Date(Date.now()+600000).toISOString()}}async releaseSeat(holdId:string){this.held.delete(`ex-701:${holdId.replace('hold-','')}`)}async createBooking(){return{bookingId:'BK-39281'}}async getTicket(bookingId:string){return{bookingId,reference:'TWX-7K3P',ticketSignature:'twendex:v1:TWX-7K3P:K9dQ7mX2',qrPayload:'twendex:v1:TWX-7K3P:K9dQ7mX2'}}}
