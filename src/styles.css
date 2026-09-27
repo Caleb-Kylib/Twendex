@@ -100,16 +100,12 @@
 }
 
 /* ---------- Structural bits kept as CSS (seat map + vehicle art) ---------- */
-.vehicle-art{height:104px;position:relative;border-radius:18px;overflow:hidden;display:flex;align-items:center;justify-content:center;
-  background:
-    radial-gradient(120% 90% at 50% 8%, #fff3e2 0%, transparent 60%),
-    linear-gradient(165deg,#ffe6cc,#ffcfb0 78%,#f6b892);
+.vehicle-art{height:110px;position:relative;border-radius:18px;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:14px 20px;
+  background:linear-gradient(165deg,#fff6ec,#ffe9d6);
   border:1px solid rgba(255,255,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
-.vehicle-art:before{content:'';position:absolute;left:0;right:0;bottom:0;height:26px;background:linear-gradient(180deg,rgba(120,60,20,.05),rgba(120,60,20,.16));border-top:1px dashed rgba(120,60,20,.22)}
-.vehicle-art:after{content:'';position:absolute;left:12%;right:12%;bottom:12px;height:2px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.7) 0 14px,transparent 14px 30px);z-index:1}
-.vehicle-art svg{position:relative;z-index:2}
-.vehicle-tag{position:absolute;z-index:3;top:9px;left:11px;font-size:8px;letter-spacing:1.4px;font-weight:800;color:#7a2f12;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);padding:2px 7px;border-radius:999px;backdrop-filter:blur(4px)}
-.premium .vehicle-tag{color:#fff;background:linear-gradient(120deg,#b94a2c,#7a2f12);border-color:rgba(255,255,255,.25)}
+.vehicle-art svg{position:relative;z-index:2;max-height:100%;width:auto}
+.vehicle-tag{position:absolute;z-index:3;top:9px;left:11px;font-size:8px;letter-spacing:1.4px;font-weight:800;color:#7a2f12;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.7);padding:2px 7px;border-radius:999px;backdrop-filter:blur(4px)}
+.premium .vehicle-tag{color:#fff;background:#b94a2c;border-color:rgba(255,255,255,.25)}
 .vehicle-art-tall{height:150px}
 
 .cabin{position:relative;border-radius:42px 42px 22px 22px;padding:55px 46px 34px;overflow:hidden}

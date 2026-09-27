@@ -57,83 +57,58 @@ function Footer({go}:{go:(x:string)=>void}){const[email,setEmail]=useState('');c
 function Steps({n}:{n:number}){return <div className="flex items-center mb-8 flex-wrap gap-y-2">{['Trip','Vehicle','Seat','Payment'].map((x,i)=><span key={x} className={'flex items-center gap-2 text-[13px] '+(i<n?'text-brand-700 font-bold':'text-muted')}><i className={'grid place-items-center size-6 rounded-full not-italic text-[11px] font-bold '+(i+1<n?'bg-brand-600 text-white':i<n?'bg-brand-600 text-white':'border border-brand-200 text-muted')}>{i+1<n?<Check className="size-3.5"/>:i+1}</i>{x}{i<3&&<em className="w-8 md:w-11 h-px bg-brand-200 mx-2 not-italic"/>}</span>)}</div>}
 
 /* ---------- vehicle illustrations (distinct SVG per type) ---------- */
+/* Bolt/Uber-style FLAT geometric vehicle icons.
+   Three silhouettes: hiace (widest/tallest), minivan (mid, sliding-door break), noah (shortest/roundest).
+   Shared Twendex accent = orange (#ff7a1a) stripe + window tint so the set reads as one family.
+   Body colors rotate: soft blue-grey / muted orange / white. */
+const ACCENT='#ff7a1a';
+type Shape='hiace'|'minivan'|'noah';
+const SHAPE:Record<Vehicle['layout'],Shape>={taxi:'hiace',shuttle:'minivan',coaster:'noah',coach:'minivan',premium:'hiace'};
+const BODY:Record<Shape,{fill:string;hub:string;win:number;outline?:string}>={
+  hiace:{fill:'#9db2c4',hub:'#9db2c4',win:0.9},
+  minivan:{fill:'#e8853a',hub:'#e8853a',win:0.95},
+  noah:{fill:'#f4f6f8',hub:'#f4f6f8',win:0.9,outline:'#d9dee3'},
+};
 function VehicleSVG({layout,className}:{layout:Vehicle['layout'];className?:string}){
-  const uid=React.useId().replace(/:/g,'');
-  const g=`bodyGrad_${uid}`,gl=`glassGrad_${uid}`,sh=`shadow_${uid}`;
-  const defs=<defs>
-    <linearGradient id={g} x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stopColor={layout==='premium'?'#7a2f12':'#f97316'}/>
-      <stop offset="0.5" stopColor={layout==='premium'?'#b94a2c':'#e2570a'}/>
-      <stop offset="1" stopColor={layout==='premium'?'#3f1c0c':'#bd420b'}/>
-    </linearGradient>
-    <linearGradient id={gl} x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stopColor="#fff7ee" stopOpacity="0.95"/>
-      <stop offset="1" stopColor="#bfe3ef" stopOpacity="0.9"/>
-    </linearGradient>
-    <radialGradient id={sh} cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stopColor="#5a2c12" stopOpacity="0.28"/>
-      <stop offset="1" stopColor="#5a2c12" stopOpacity="0"/>
-    </radialGradient>
-  </defs>;
-  const Wheels=({xs}:{xs:number[]})=><g>{xs.map(x=><g key={x}><circle cx={x} cy="112" r="13" fill="#2e1a10"/><circle cx={x} cy="112" r="6" fill="#8a6f5c"/><circle cx={x} cy="112" r="2.4" fill="#3a2416"/></g>)}</g>;
-  const shadow=<ellipse cx="150" cy="126" rx="118" ry="9" fill={`url(#${sh})`}/>;
-  const win=(x:number,y:number,w:number,h:number,r=4)=><rect x={x} y={y} width={w} height={h} rx={r} fill={`url(#${gl})`} stroke="#ffffff" strokeOpacity="0.5"/>;
-
+  const shape=SHAPE[layout];const c=BODY[shape];
   let art:React.ReactNode;
-  if(layout==='taxi'){ // compact minivan (Hiace)
+  if(shape==='hiace'){
     art=<g>
-      <path d="M52 96 L52 60 Q54 44 74 42 L150 40 Q188 40 214 58 L244 74 Q252 78 252 90 L252 96 Q252 100 248 100 L56 100 Q52 100 52 96 Z" fill={`url(#${g})`}/>
-      <path d="M74 46 L146 45 L146 66 L64 66 L66 58 Q68 48 74 46 Z" fill={`url(#${gl})`} stroke="#fff" strokeOpacity=".5"/>
-      {win(152,45,26,20)}{win(184,47,24,19)}
-      <path d="M210 56 L236 72 Q210 70 210 70 Z" fill={`url(#${gl})`} stroke="#fff" strokeOpacity=".5"/>
-      <rect x="52" y="86" width="200" height="6" rx="3" fill="#ffffff" fillOpacity=".22"/>
-      <Wheels xs={[92,208]}/>
+      <path d="M20 44 Q20 34 34 34 L214 34 Q236 34 236 56 L236 92 Q236 100 226 100 L26 100 Q20 100 20 92 Z" fill={c.fill}/>
+      <rect x="20" y="60" width="10" height="34" rx="3" fill="#8aa1b5"/>
+      <path d="M40 42 L206 42 Q220 42 220 56 L220 62 L40 62 Z" fill={ACCENT} opacity={c.win}/>
+      <rect x="92" y="42" width="4" height="20" fill={c.fill}/>
+      <rect x="146" y="42" width="4" height="20" fill={c.fill}/>
+      <rect x="20" y="86" width="216" height="5" fill={ACCENT}/>
+      <circle cx="74" cy="100" r="20" fill="#2b3742"/><circle cx="74" cy="100" r="8" fill={c.hub}/>
+      <circle cx="196" cy="100" r="20" fill="#2b3742"/><circle cx="196" cy="100" r="8" fill={c.hub}/>
     </g>;
-  } else if(layout==='shuttle'){ // tall sprinter shuttle
+  } else if(shape==='minivan'){
     art=<g>
-      <path d="M40 100 L40 46 Q42 34 58 34 L214 34 Q244 34 256 56 L262 74 Q264 80 264 90 L264 96 Q264 100 260 100 L44 100 Q40 100 40 96 Z" fill={`url(#${g})`}/>
-      {win(56,42,40,26)}{win(102,42,40,26)}{win(148,42,40,26)}{win(194,42,30,26)}
-      <path d="M230 44 L252 62 Q234 62 230 62 Z" fill={`url(#${gl})`} stroke="#fff" strokeOpacity=".5"/>
-      <rect x="40" y="82" width="224" height="7" rx="3" fill="#ffffff" fillOpacity=".2"/>
-      <rect x="46" y="90" width="10" height="8" rx="2" fill="#ffd27a"/>
-      <Wheels xs={[86,224]}/>
+      <path d="M34 48 Q34 40 46 38 L176 34 Q206 34 224 54 L232 66 Q236 72 236 82 L236 92 Q236 100 226 100 L40 100 Q34 100 34 92 Z" fill={c.fill}/>
+      <path d="M52 44 L176 41 Q198 41 210 56 L214 62 L52 62 Z" fill="#ffb877" opacity={c.win}/>
+      <rect x="118" y="42" width="4" height="20" fill={c.fill}/>
+      <rect x="120" y="64" width="3" height="30" fill="#c96a24"/>
+      <rect x="120" y="72" width="14" height="4" rx="2" fill="#c96a24"/>
+      <rect x="34" y="86" width="202" height="5" fill={ACCENT}/>
+      <circle cx="82" cy="100" r="20" fill="#2b3742"/><circle cx="82" cy="100" r="8" fill={c.hub}/>
+      <circle cx="196" cy="100" r="20" fill="#2b3742"/><circle cx="196" cy="100" r="8" fill={c.hub}/>
     </g>;
-  } else if(layout==='coaster'){ // mid coaster bus
+  } else {
+    const d="M58 52 Q60 40 84 38 Q140 34 168 40 Q196 46 210 62 Q216 70 216 80 L216 92 Q216 100 206 100 L64 100 Q58 100 58 92 Z";
     art=<g>
-      <path d="M32 100 L32 48 Q34 38 48 38 L250 38 Q266 38 268 54 L268 96 Q268 100 264 100 L36 100 Q32 100 32 96 Z" fill={`url(#${g})`}/>
-      {[0,1,2,3,4].map(i=>win(46+i*44,46,38,24))}
-      <rect x="32" y="80" width="236" height="8" rx="3" fill="#ffffff" fillOpacity=".2"/>
-      <rect x="248" y="46" width="16" height="24" rx="3" fill={`url(#${gl})`} stroke="#fff" strokeOpacity=".5"/>
-      <rect x="38" y="90" width="12" height="8" rx="2" fill="#ffd27a"/>
-      <rect x="250" y="90" width="12" height="8" rx="2" fill="#ff8f6b"/>
-      <Wheels xs={[80,222]}/>
-    </g>;
-  } else if(layout==='coach'){ // long standard coach
-    art=<g>
-      <path d="M20 102 L20 52 Q22 40 40 40 L272 40 Q286 40 286 54 L286 98 Q286 102 282 102 L24 102 Q20 102 20 98 Z" fill={`url(#${g})`}/>
-      {[0,1,2,3,4,5].map(i=>win(34+i*40,48,34,22))}
-      <rect x="20" y="80" width="266" height="9" rx="3" fill="#ffffff" fillOpacity=".18"/>
-      <rect x="270" y="48" width="14" height="22" rx="3" fill={`url(#${gl})`} stroke="#fff" strokeOpacity=".5"/>
-      <rect x="26" y="92" width="14" height="8" rx="2" fill="#ffd27a"/>
-      <rect x="268" y="92" width="14" height="8" rx="2" fill="#ff8f6b"/>
-      <Wheels xs={[72,168,238]}/>
-    </g>;
-  } else { // premium coach with double glazing + stripe
-    art=<g>
-      <path d="M18 104 L18 50 Q20 36 40 36 L274 36 Q288 36 288 52 L288 100 Q288 104 284 104 L22 104 Q18 104 18 100 Z" fill={`url(#${g})`}/>
-      <rect x="18" y="58" width="270" height="4" fill="#ffcf8f"/>
-      {[0,1,2,3,4,5].map(i=>win(34+i*40,44,34,12,3))}
-      {[0,1,2,3,4,5].map(i=>win(34+i*40,64,34,16,3))}
-      <rect x="272" y="44" width="14" height="36" rx="3" fill={`url(#${gl})`} stroke="#fff" strokeOpacity=".5"/>
-      <rect x="18" y="88" width="270" height="9" rx="3" fill="#ffffff" fillOpacity=".16"/>
-      <rect x="24" y="94" width="14" height="8" rx="2" fill="#fff0c2"/>
-      <rect x="270" y="94" width="14" height="8" rx="2" fill="#ff8f6b"/>
-      <Wheels xs={[70,170,242]}/>
+      <path d={d} fill={c.fill}/>
+      {c.outline&&<path d={d} fill="none" stroke={c.outline} strokeWidth="2"/>}
+      <path d="M74 46 Q120 40 160 44 Q186 48 198 62 L74 62 Z" fill={ACCENT} opacity={c.win}/>
+      <rect x="126" y="42" width="4" height="20" fill={c.fill}/>
+      <rect x="58" y="86" width="158" height="5" fill={ACCENT}/>
+      <circle cx="96" cy="100" r="19" fill="#2b3742"/><circle cx="96" cy="100" r="7.5" fill={c.hub}/>
+      <circle cx="182" cy="100" r="19" fill="#2b3742"/><circle cx="182" cy="100" r="7.5" fill={c.hub}/>
     </g>;
   }
-  return <svg viewBox="0 0 300 132" className={className} role="img" aria-label={layout+' vehicle'} preserveAspectRatio="xMidYMid meet">{defs}{shadow}{art}</svg>;
+  return <svg viewBox="0 0 260 140" className={className} role="img" aria-label={shape+' vehicle'} preserveAspectRatio="xMidYMid meet">{art}</svg>;
 }
-function Art({v,tall,badge}:{v:Vehicle;tall?:boolean;badge?:string}){return <div className={'vehicle-art '+v.layout+(tall?' vehicle-art-tall':'')}><VehicleSVG layout={v.layout} className="w-[86%] h-[86%] transition-transform duration-300 group-hover:scale-[1.05] drop-shadow-[0_6px_10px_rgba(120,60,20,0.22)]"/><span className="vehicle-tag">{v.layout==='premium'?'PREMIUM':'TWENDEX'}</span>{badge&&<span className="absolute z-[3] top-2 right-2 rounded-full bg-white/70 border border-white/70 backdrop-blur px-2.5 py-1 text-[11px] font-bold text-brand-800 flex items-center gap-1"><Users className="size-3"/>{badge}</span>}</div>}
+function Art({v,tall,badge}:{v:Vehicle;tall?:boolean;badge?:string}){return <div className={'vehicle-art '+v.layout+(tall?' vehicle-art-tall':'')}><VehicleSVG layout={v.layout} className="w-[92%] max-h-full transition-transform duration-300 group-hover:scale-[1.04]"/><span className="vehicle-tag">{v.layout==='premium'?'PREMIUM':'TWENDEX'}</span>{badge&&<span className="absolute z-[3] top-2 right-2 rounded-full bg-white/70 border border-white/70 backdrop-blur px-2.5 py-1 text-[11px] font-bold text-brand-800 flex items-center gap-1"><Users className="size-3"/>{badge}</span>}</div>}
 function Amenities({v}:{v:Vehicle}){return <div className="flex gap-2 flex-wrap">{v.amenities.map(x=><span key={x} className="inline-flex items-center gap-1.5 rounded-full bg-brand-100/70 border border-brand-200/70 text-brand-800 px-2.5 py-1 text-xs font-semibold [&_svg]:size-3.5 [&_svg]:text-brand-600">{amenity(x)}{x}</span>)}</div>}
 
 /* ---------- homepage data ---------- */

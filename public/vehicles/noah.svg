@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 140" width="260" height="140" role="img" aria-label="Toyota Noah">
+  <!-- Noah: compact MPV, most rounded front + roofline, shortest body, smallest silhouette. Body: white. Accent: Twendex orange. -->
+  <!-- body (short, rounded fastback roof) -->
+  <path d="M58 52
+           Q60 40 84 38
+           Q140 34 168 40
+           Q196 46 210 62
+           Q216 70 216 80
+           L216 92
+           Q216 100 206 100
+           L64 100
+           Q58 100 58 92
+           Z" fill="#f4f6f8"/>
+  <!-- subtle single thin outline to keep white body readable -->
+  <path d="M58 52
+           Q60 40 84 38
+           Q140 34 168 40
+           Q196 46 210 62
+           Q216 70 216 80
+           L216 92
+           Q216 100 206 100
+           L64 100
+           Q58 100 58 92
+           Z" fill="none" stroke="#d9dee3" stroke-width="2"/>
+  <!-- windows (orange-tinted, rounded to match roofline) -->
+  <path d="M74 46 Q120 40 160 44 Q186 48 198 62 L74 62 Z" fill="#ff7a1a" opacity="0.9"/>
+  <!-- window pillar -->
+  <rect x="126" y="42" width="4" height="20" fill="#f4f6f8"/>
+  <!-- Twendex accent stripe -->
+  <rect x="58" y="86" width="158" height="5" fill="#ff7a1a"/>
+  <!-- wheels -->
+  <circle cx="96" cy="100" r="19" fill="#2b3742"/>
+  <circle cx="96" cy="100" r="7.5" fill="#f4f6f8"/>
+  <circle cx="182" cy="100" r="19" fill="#2b3742"/>
+  <circle cx="182" cy="100" r="7.5" fill="#f4f6f8"/>
+</svg>

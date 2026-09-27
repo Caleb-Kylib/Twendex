@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 140" width="260" height="140" role="img" aria-label="Toyota Hiace">
+  <!-- Hiace: widest + tallest, flat vertical nose, long tall greenhouse. Body: soft blue-grey. Accent: Twendex orange. -->
+  <!-- body -->
+  <path d="M20 44
+           Q20 34 34 34
+           L214 34
+           Q236 34 236 56
+           L236 92
+           Q236 100 226 100
+           L26 100
+           Q20 100 20 92
+           Z" fill="#9db2c4"/>
+  <!-- flat front nose face -->
+  <rect x="20" y="60" width="10" height="34" rx="3" fill="#8aa1b5"/>
+  <!-- windows (orange-tinted greenhouse) -->
+  <path d="M40 42 L206 42 Q220 42 220 56 L220 62 L40 62 Z" fill="#ff7a1a" opacity="0.9"/>
+  <!-- window pillars -->
+  <rect x="92" y="42" width="4" height="20" fill="#9db2c4"/>
+  <rect x="146" y="42" width="4" height="20" fill="#9db2c4"/>
+  <!-- Twendex accent stripe -->
+  <rect x="20" y="86" width="216" height="5" fill="#ff7a1a"/>
+  <!-- wheels (oversized, flat) -->
+  <circle cx="74" cy="100" r="20" fill="#2b3742"/>
+  <circle cx="74" cy="100" r="8" fill="#9db2c4"/>
+  <circle cx="196" cy="100" r="20" fill="#2b3742"/>
+  <circle cx="196" cy="100" r="8" fill="#9db2c4"/>
+</svg>
