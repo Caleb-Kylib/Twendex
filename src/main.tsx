@@ -8,6 +8,8 @@ import{Button}from'@/components/ui/button';
 import{Card}from'@/components/ui/card';
 import{Badge}from'@/components/ui/badge';
 import{Input,Select}from'@/components/ui/input';
+import{SeatSelection}from'@/features/seats/SeatSelection';
+import type{VehicleType}from'@/features/seats/seatMaps';
 
 type State='available'|'held'|'taken'|'unavailable';
 type Vehicle={id:string;kind:string;short:string;capacity:number;time:string;fare:number;remaining:number;pickup:string;duration:string;plate:string;driver:string;layout:'taxi'|'shuttle'|'coaster'|'coach'|'premium';amenities:string[];seats:Record<string,State>};
@@ -62,51 +64,87 @@ function Steps({n}:{n:number}){return <div className="flex items-center mb-8 fle
    Shared Twendex accent = orange (#ff7a1a) stripe + window tint so the set reads as one family.
    Body colors rotate: soft blue-grey / muted orange / white. */
 const ACCENT='#ff7a1a';
+const TIRE='#2a333c';
 type Shape='hiace'|'minivan'|'noah';
 const SHAPE:Record<Vehicle['layout'],Shape>={taxi:'hiace',shuttle:'minivan',coaster:'noah',coach:'minivan',premium:'hiace'};
-const BODY:Record<Shape,{fill:string;hub:string;win:number;outline?:string}>={
-  hiace:{fill:'#9db2c4',hub:'#9db2c4',win:0.9},
-  minivan:{fill:'#e8853a',hub:'#e8853a',win:0.95},
-  noah:{fill:'#f4f6f8',hub:'#f4f6f8',win:0.9,outline:'#d9dee3'},
+// body = main fill, dark = rocker panel / lower shade, win = glass tint, rim = wheel rim color
+const BODY:Record<Shape,{fill:string;dark:string;win:string;rim:string;outline?:string}>={
+  hiace:{fill:'#a7bccd',dark:'#8ba3b6',win:'#3a4a58',rim:'#c9d7e2'},
+  minivan:{fill:'#f2923f',dark:'#d9762a',win:'#7a3f18',rim:'#ffd0a2'},
+  noah:{fill:'#fbfcfd',dark:'#e7ecf1',win:'#46586a',rim:'#eef2f6',outline:'#dbe1e8'},
 };
+const Wheel=({cx,r,rim}:{cx:number;r:number;rim:string})=><g>
+  <circle cx={cx} cy="102" r={r} fill={TIRE}/>
+  <circle cx={cx} cy="102" r={r*0.52} fill={rim}/>
+  <circle cx={cx} cy="102" r={r*0.2} fill={TIRE}/>
+</g>;
 function VehicleSVG({layout,className}:{layout:Vehicle['layout'];className?:string}){
   const shape=SHAPE[layout];const c=BODY[shape];
+  const uid=React.useId().replace(/:/g,'');
+  const sh=`vsh_${uid}`,gl=`vgl_${uid}`;
+  const defs=<defs>
+    <filter id={sh} x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="6" stdDeviation="5" floodColor="#5a3d24" floodOpacity="0.18"/></filter>
+    <linearGradient id={gl} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ffffff" stopOpacity="0.35"/><stop offset="0.55" stopColor="#ffffff" stopOpacity="0"/></linearGradient>
+  </defs>;
   let art:React.ReactNode;
   if(shape==='hiace'){
+    const body="M22 46 Q22 34 36 34 L212 34 Q234 34 236 56 L237 88 Q237 98 227 98 L30 98 Q22 98 22 90 Z";
     art=<g>
-      <path d="M20 44 Q20 34 34 34 L214 34 Q236 34 236 56 L236 92 Q236 100 226 100 L26 100 Q20 100 20 92 Z" fill={c.fill}/>
-      <rect x="20" y="60" width="10" height="34" rx="3" fill="#8aa1b5"/>
-      <path d="M40 42 L206 42 Q220 42 220 56 L220 62 L40 62 Z" fill={ACCENT} opacity={c.win}/>
-      <rect x="92" y="42" width="4" height="20" fill={c.fill}/>
-      <rect x="146" y="42" width="4" height="20" fill={c.fill}/>
-      <rect x="20" y="86" width="216" height="5" fill={ACCENT}/>
-      <circle cx="74" cy="100" r="20" fill="#2b3742"/><circle cx="74" cy="100" r="8" fill={c.hub}/>
-      <circle cx="196" cy="100" r="20" fill="#2b3742"/><circle cx="196" cy="100" r="8" fill={c.hub}/>
+      <g filter={`url(#${sh})`}>
+        <path d={body} fill={c.fill}/>
+        {c.outline&&<path d={body} fill="none" stroke={c.outline} strokeWidth="2"/>}
+      </g>
+      <path d="M22 82 L237 82 L237 88 Q237 98 227 98 L30 98 Q22 98 22 90 Z" fill={c.dark}/>
+      <path d="M40 43 Q40 40 44 40 L206 40 Q219 40 220 54 L220 63 L40 63 Z" fill={c.win}/>
+      <path d="M44 42 L214 42 L214 50 L44 52 Z" fill={`url(#${gl})`}/>
+      <rect x="92" y="40" width="4" height="23" rx="1.5" fill={c.fill}/>
+      <rect x="146" y="40" width="4" height="23" rx="1.5" fill={c.fill}/>
+      <rect x="24" y="70" width="211" height="4.5" rx="2.25" fill={ACCENT}/>
+      <rect x="228" y="60" width="9" height="9" rx="2.5" fill="#ffd76b"/>
+      <rect x="22" y="60" width="6" height="8" rx="2" fill="#e2574e"/>
+      <path d="M50 98 Q50 78 74 78 Q98 78 98 98 Z" fill={c.dark}/>
+      <path d="M172 98 Q172 78 196 78 Q220 78 220 98 Z" fill={c.dark}/>
+      <Wheel cx={74} r={20} rim={c.rim}/><Wheel cx={196} r={20} rim={c.rim}/>
     </g>;
   } else if(shape==='minivan'){
+    const body="M34 50 Q34 42 46 40 L172 34 Q202 33 222 54 L232 68 Q237 74 237 84 L237 88 Q237 98 227 98 L44 98 Q34 98 34 90 Z";
     art=<g>
-      <path d="M34 48 Q34 40 46 38 L176 34 Q206 34 224 54 L232 66 Q236 72 236 82 L236 92 Q236 100 226 100 L40 100 Q34 100 34 92 Z" fill={c.fill}/>
-      <path d="M52 44 L176 41 Q198 41 210 56 L214 62 L52 62 Z" fill="#ffb877" opacity={c.win}/>
-      <rect x="118" y="42" width="4" height="20" fill={c.fill}/>
-      <rect x="120" y="64" width="3" height="30" fill="#c96a24"/>
-      <rect x="120" y="72" width="14" height="4" rx="2" fill="#c96a24"/>
-      <rect x="34" y="86" width="202" height="5" fill={ACCENT}/>
-      <circle cx="82" cy="100" r="20" fill="#2b3742"/><circle cx="82" cy="100" r="8" fill={c.hub}/>
-      <circle cx="196" cy="100" r="20" fill="#2b3742"/><circle cx="196" cy="100" r="8" fill={c.hub}/>
+      <g filter={`url(#${sh})`}>
+        <path d={body} fill={c.fill}/>
+      </g>
+      <path d="M34 82 L237 82 L237 88 Q237 98 227 98 L44 98 Q34 98 34 90 Z" fill={c.dark}/>
+      <path d="M52 46 L172 40 Q196 40 208 56 L213 63 L52 63 Z" fill={c.win}/>
+      <path d="M56 45 L172 41 L200 56 L56 54 Z" fill={`url(#${gl})`}/>
+      <rect x="116" y="42" width="4" height="21" rx="1.5" fill={c.fill}/>
+      <rect x="120" y="64" width="3" height="18" fill={c.dark}/>
+      <rect x="122" y="70" width="13" height="4" rx="2" fill={c.dark}/>
+      <rect x="36" y="70" width="199" height="4.5" rx="2.25" fill={ACCENT}/>
+      <rect x="229" y="62" width="8" height="9" rx="2.5" fill="#ffd76b"/>
+      <rect x="34" y="62" width="6" height="8" rx="2" fill="#c0361f"/>
+      <path d="M58 98 Q58 78 82 78 Q106 78 106 98 Z" fill={c.dark}/>
+      <path d="M172 98 Q172 78 196 78 Q220 78 220 98 Z" fill={c.dark}/>
+      <Wheel cx={82} r={20} rim={c.rim}/><Wheel cx={196} r={20} rim={c.rim}/>
     </g>;
   } else {
-    const d="M58 52 Q60 40 84 38 Q140 34 168 40 Q196 46 210 62 Q216 70 216 80 L216 92 Q216 100 206 100 L64 100 Q58 100 58 92 Z";
+    const body="M60 54 Q62 42 86 40 Q140 36 166 42 Q194 48 208 64 Q214 72 214 82 L214 88 Q214 98 204 98 L66 98 Q60 98 60 90 Z";
     art=<g>
-      <path d={d} fill={c.fill}/>
-      {c.outline&&<path d={d} fill="none" stroke={c.outline} strokeWidth="2"/>}
-      <path d="M74 46 Q120 40 160 44 Q186 48 198 62 L74 62 Z" fill={ACCENT} opacity={c.win}/>
-      <rect x="126" y="42" width="4" height="20" fill={c.fill}/>
-      <rect x="58" y="86" width="158" height="5" fill={ACCENT}/>
-      <circle cx="96" cy="100" r="19" fill="#2b3742"/><circle cx="96" cy="100" r="7.5" fill={c.hub}/>
-      <circle cx="182" cy="100" r="19" fill="#2b3742"/><circle cx="182" cy="100" r="7.5" fill={c.hub}/>
+      <g filter={`url(#${sh})`}>
+        <path d={body} fill={c.fill}/>
+        {c.outline&&<path d={body} fill="none" stroke={c.outline} strokeWidth="2"/>}
+      </g>
+      <path d="M60 82 L214 82 L214 88 Q214 98 204 98 L66 98 Q60 98 60 90 Z" fill={c.dark}/>
+      <path d="M76 48 Q120 42 158 46 Q184 50 196 63 L76 63 Z" fill={c.win}/>
+      <path d="M80 47 Q120 43 158 47 L186 60 L80 55 Z" fill={`url(#${gl})`}/>
+      <rect x="126" y="43" width="4" height="20" rx="1.5" fill={c.fill}/>
+      <rect x="62" y="70" width="152" height="4.5" rx="2.25" fill={ACCENT}/>
+      <rect x="206" y="62" width="8" height="9" rx="2.5" fill="#ffd76b"/>
+      <rect x="60" y="62" width="6" height="8" rx="2" fill="#e2574e"/>
+      <path d="M74 98 Q74 79 96 79 Q118 79 118 98 Z" fill={c.dark}/>
+      <path d="M160 98 Q160 79 182 79 Q204 79 204 98 Z" fill={c.dark}/>
+      <Wheel cx={96} r={19} rim={c.rim}/><Wheel cx={182} r={19} rim={c.rim}/>
     </g>;
   }
-  return <svg viewBox="0 0 260 140" className={className} role="img" aria-label={shape+' vehicle'} preserveAspectRatio="xMidYMid meet">{art}</svg>;
+  return <svg viewBox="0 0 260 128" className={className} role="img" aria-label={shape+' vehicle'} preserveAspectRatio="xMidYMid meet">{defs}{art}</svg>;
 }
 function Art({v,tall,badge}:{v:Vehicle;tall?:boolean;badge?:string}){return <div className={'vehicle-art '+v.layout+(tall?' vehicle-art-tall':'')}><VehicleSVG layout={v.layout} className="w-[92%] max-h-full transition-transform duration-300 group-hover:scale-[1.04]"/><span className="vehicle-tag">{v.layout==='premium'?'PREMIUM':'TWENDEX'}</span>{badge&&<span className="absolute z-[3] top-2 right-2 rounded-full bg-white/70 border border-white/70 backdrop-blur px-2.5 py-1 text-[11px] font-bold text-brand-800 flex items-center gap-1"><Users className="size-3"/>{badge}</span>}</div>}
 function Amenities({v}:{v:Vehicle}){return <div className="flex gap-2 flex-wrap">{v.amenities.map(x=><span key={x} className="inline-flex items-center gap-1.5 rounded-full bg-brand-100/70 border border-brand-200/70 text-brand-800 px-2.5 py-1 text-xs font-semibold [&_svg]:size-3.5 [&_svg]:text-brand-600">{amenity(x)}{x}</span>)}</div>}
@@ -223,5 +261,6 @@ function Safety({go}:{go:(x:string)=>void}){const[sos,setSos]=useState(false);re
 {sos&&<div className="fixed inset-0 z-50 grid place-items-center p-5 bg-cocoa-deep/70 backdrop-blur-sm"><Card variant="strong" className="relative max-w-md w-full p-8"><button className="absolute right-4 top-3 text-2xl text-muted" onClick={()=>setSos(false)}>×</button><div className="grid place-items-center size-[70px] rounded-full bg-rose-500/15 text-rose-500 [&_svg]:size-8"><Phone/></div><h2 className="text-3xl font-semibold text-cocoa mt-4 mb-2">Send SOS?</h2><p className="text-muted leading-relaxed">This shares your trip and vehicle details with Twendex support. For immediate danger, call local emergency services first.</p><Button variant="destructive" className="w-full mt-5" onClick={()=>setSos(false)}>Send SOS alert</Button></Card></div>}
 </main>}
 
-function App(){let{p,go}=useRoute(),id=p.split('/')[2],v=vehicles.find(x=>x.id===id)||vehicles[0],q=new URLSearchParams(location.search);let page=p==='/'?<Search go={go}/>:p==='/trips'?<Trips go={go}/>:p.startsWith('/trips/')?<Detail v={v} go={go}/>:p.startsWith('/book/')?<Seats v={v} go={go}/>:p==='/checkout'?<Checkout v={vehicles.find(x=>x.id===q.get('trip'))||vehicles[0]} sel={q.get('seat')||''} go={go}/>:p.startsWith('/payment')?<Payment go={go}/>:p.startsWith('/tickets')?<TicketView go={go}/>:p==='/my-trips'?<MyTrips go={go}/>:p.startsWith('/safety')?<Safety go={go}/>:<Search go={go}/>;const hideFooter=p.startsWith('/book/')||p==='/checkout'||p.startsWith('/payment')||p.startsWith('/safety');return <><Bg/><Header go={go}/>{page}{!hideFooter&&<Footer go={go}/>}</>}
+function SeatDemo({go}:{go:(x:string)=>void}){const[vt,setVt]=useState<VehicleType>('coaster-29');const fare=vt==='hiace-14'?12000:15000;return <main><div className="mx-auto w-full max-w-lg px-4 pt-6"><Button variant="ghost" size="sm" className="-ml-2 text-brand-700" onClick={()=>go('/')}><ArrowLeft/>Home</Button><div className="mt-3 flex gap-2">{([['coaster-29','Coaster · 29'],['hiace-14','Hiace · 14']] as [VehicleType,string][]).map(([id,lbl])=><button key={id} onClick={()=>setVt(id)} className={'rounded-xl px-4 py-2 text-sm font-bold transition '+(vt===id?'bg-[#E8622C] text-white':'border border-[#f0c3ab] bg-white text-[#a35a37]')}>{lbl}</button>)}</div></div><SeatSelection key={vt} vehicleType={vt} pricePerSeat={fare} seatsToBook={3} onContinue={s=>alert('Continue with seats: '+s.join(', '))}/></main>}
+function App(){let{p,go}=useRoute(),id=p.split('/')[2],v=vehicles.find(x=>x.id===id)||vehicles[0],q=new URLSearchParams(location.search);let page=p==='/'?<Search go={go}/>:p==='/trips'?<Trips go={go}/>:p.startsWith('/trips/')?<Detail v={v} go={go}/>:p.startsWith('/book/')?<Seats v={v} go={go}/>:p==='/seatdemo'?<SeatDemo go={go}/>:p==='/checkout'?<Checkout v={vehicles.find(x=>x.id===q.get('trip'))||vehicles[0]} sel={q.get('seat')||''} go={go}/>:p.startsWith('/payment')?<Payment go={go}/>:p.startsWith('/tickets')?<TicketView go={go}/>:p==='/my-trips'?<MyTrips go={go}/>:p.startsWith('/safety')?<Safety go={go}/>:<Search go={go}/>;const hideFooter=p.startsWith('/book/')||p==='/checkout'||p.startsWith('/payment')||p.startsWith('/safety')||p==='/seatdemo';return <><Bg/><Header go={go}/>{page}{!hideFooter&&<Footer go={go}/>}</>}
 createRoot(document.getElementById('root')!).render(<App/>);

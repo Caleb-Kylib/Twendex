@@ -1,29 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 140" width="260" height="140" role="img" aria-label="Shared-taxi minivan">
-  <!-- Minivan: mid-size, slightly rounder + shorter than Hiace, sliding-door panel break. Body: muted orange. Accent: Twendex orange. -->
-  <!-- body -->
-  <path d="M34 48
-           Q34 40 46 38
-           L176 34
-           Q206 34 224 54
-           L232 66
-           Q236 72 236 82
-           L236 92
-           Q236 100 226 100
-           L40 100
-           Q34 100 34 92
-           Z" fill="#e8853a"/>
-  <!-- windows (orange-tinted, slightly darker for contrast on orange body) -->
-  <path d="M52 44 L176 41 Q198 41 210 56 L214 62 L52 62 Z" fill="#ffb877" opacity="0.95"/>
-  <!-- window pillar -->
-  <rect x="118" y="42" width="4" height="20" fill="#e8853a"/>
-  <!-- sliding-door panel break -->
-  <rect x="120" y="64" width="3" height="30" fill="#c96a24"/>
-  <rect x="120" y="72" width="14" height="4" rx="2" fill="#c96a24"/>
-  <!-- Twendex accent stripe -->
-  <rect x="34" y="86" width="202" height="5" fill="#ff7a1a"/>
-  <!-- wheels -->
-  <circle cx="82" cy="100" r="20" fill="#2b3742"/>
-  <circle cx="82" cy="100" r="8" fill="#e8853a"/>
-  <circle cx="196" cy="100" r="20" fill="#2b3742"/>
-  <circle cx="196" cy="100" r="8" fill="#e8853a"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 128" width="260" height="128" role="img" aria-label="Shared-taxi minivan">
+  <!-- Minivan: mid-size, rounder, sliding-door seam. Body muted orange + orange Twendex accent. -->
+  <defs>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#5a3d24" flood-opacity="0.18"/></filter>
+    <linearGradient id="gl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.35"/><stop offset="0.55" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <g filter="url(#sh)"><path d="M34 50 Q34 42 46 40 L172 34 Q202 33 222 54 L232 68 Q237 74 237 84 L237 88 Q237 98 227 98 L44 98 Q34 98 34 90 Z" fill="#f2923f"/></g>
+  <path d="M34 82 L237 82 L237 88 Q237 98 227 98 L44 98 Q34 98 34 90 Z" fill="#d9762a"/>
+  <path d="M52 46 L172 40 Q196 40 208 56 L213 63 L52 63 Z" fill="#7a3f18"/>
+  <path d="M56 45 L172 41 L200 56 L56 54 Z" fill="url(#gl)"/>
+  <rect x="116" y="42" width="4" height="21" rx="1.5" fill="#f2923f"/>
+  <rect x="120" y="64" width="3" height="18" fill="#d9762a"/>
+  <rect x="122" y="70" width="13" height="4" rx="2" fill="#d9762a"/>
+  <rect x="36" y="70" width="199" height="4.5" rx="2.25" fill="#ff7a1a"/>
+  <rect x="229" y="62" width="8" height="9" rx="2.5" fill="#ffd76b"/>
+  <rect x="34" y="62" width="6" height="8" rx="2" fill="#c0361f"/>
+  <path d="M58 98 Q58 78 82 78 Q106 78 106 98 Z" fill="#d9762a"/>
+  <path d="M172 98 Q172 78 196 78 Q220 78 220 98 Z" fill="#d9762a"/>
+  <g><circle cx="82" cy="102" r="20" fill="#2a333c"/><circle cx="82" cy="102" r="10.4" fill="#ffd0a2"/><circle cx="82" cy="102" r="4" fill="#2a333c"/></g>
+  <g><circle cx="196" cy="102" r="20" fill="#2a333c"/><circle cx="196" cy="102" r="10.4" fill="#ffd0a2"/><circle cx="196" cy="102" r="4" fill="#2a333c"/></g>
 </svg>

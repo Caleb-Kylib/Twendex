@@ -100,9 +100,13 @@
 }
 
 /* ---------- Structural bits kept as CSS (seat map + vehicle art) ---------- */
-.vehicle-art{height:110px;position:relative;border-radius:18px;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:14px 20px;
-  background:linear-gradient(165deg,#fff6ec,#ffe9d6);
-  border:1px solid rgba(255,255,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
+.vehicle-art{height:112px;position:relative;border-radius:18px;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:14px 22px;
+  background:
+    radial-gradient(90% 130% at 50% 118%, rgba(255,255,255,.85) 0%, transparent 55%),
+    radial-gradient(120% 120% at 82% 6%, #fff7ee 0%, transparent 48%),
+    linear-gradient(160deg,#ffeede,#ffdcc4);
+  border:1px solid rgba(255,255,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+.vehicle-art:before{content:'';position:absolute;left:50%;bottom:11px;width:64%;height:12px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(90,45,20,.22),transparent);z-index:1}
 .vehicle-art svg{position:relative;z-index:2;max-height:100%;width:auto}
 .vehicle-tag{position:absolute;z-index:3;top:9px;left:11px;font-size:8px;letter-spacing:1.4px;font-weight:800;color:#7a2f12;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.7);padding:2px 7px;border-radius:999px;backdrop-filter:blur(4px)}
 .premium .vehicle-tag{color:#fff;background:#b94a2c;border-color:rgba(255,255,255,.25)}

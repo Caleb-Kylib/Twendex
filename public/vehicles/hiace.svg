@@ -1,27 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 140" width="260" height="140" role="img" aria-label="Toyota Hiace">
-  <!-- Hiace: widest + tallest, flat vertical nose, long tall greenhouse. Body: soft blue-grey. Accent: Twendex orange. -->
-  <!-- body -->
-  <path d="M20 44
-           Q20 34 34 34
-           L214 34
-           Q236 34 236 56
-           L236 92
-           Q236 100 226 100
-           L26 100
-           Q20 100 20 92
-           Z" fill="#9db2c4"/>
-  <!-- flat front nose face -->
-  <rect x="20" y="60" width="10" height="34" rx="3" fill="#8aa1b5"/>
-  <!-- windows (orange-tinted greenhouse) -->
-  <path d="M40 42 L206 42 Q220 42 220 56 L220 62 L40 62 Z" fill="#ff7a1a" opacity="0.9"/>
-  <!-- window pillars -->
-  <rect x="92" y="42" width="4" height="20" fill="#9db2c4"/>
-  <rect x="146" y="42" width="4" height="20" fill="#9db2c4"/>
-  <!-- Twendex accent stripe -->
-  <rect x="20" y="86" width="216" height="5" fill="#ff7a1a"/>
-  <!-- wheels (oversized, flat) -->
-  <circle cx="74" cy="100" r="20" fill="#2b3742"/>
-  <circle cx="74" cy="100" r="8" fill="#9db2c4"/>
-  <circle cx="196" cy="100" r="20" fill="#2b3742"/>
-  <circle cx="196" cy="100" r="8" fill="#9db2c4"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 128" width="260" height="128" role="img" aria-label="Toyota Hiace">
+  <!-- Hiace: widest + tallest, flat vertical nose. Body soft blue-grey + orange Twendex accent. -->
+  <defs>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#5a3d24" flood-opacity="0.18"/></filter>
+    <linearGradient id="gl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.35"/><stop offset="0.55" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <g filter="url(#sh)"><path d="M22 46 Q22 34 36 34 L212 34 Q234 34 236 56 L237 88 Q237 98 227 98 L30 98 Q22 98 22 90 Z" fill="#a7bccd"/></g>
+  <path d="M22 82 L237 82 L237 88 Q237 98 227 98 L30 98 Q22 98 22 90 Z" fill="#8ba3b6"/>
+  <path d="M40 43 Q40 40 44 40 L206 40 Q219 40 220 54 L220 63 L40 63 Z" fill="#3a4a58"/>
+  <path d="M44 42 L214 42 L214 50 L44 52 Z" fill="url(#gl)"/>
+  <rect x="92" y="40" width="4" height="23" rx="1.5" fill="#a7bccd"/>
+  <rect x="146" y="40" width="4" height="23" rx="1.5" fill="#a7bccd"/>
+  <rect x="24" y="70" width="211" height="4.5" rx="2.25" fill="#ff7a1a"/>
+  <rect x="228" y="60" width="9" height="9" rx="2.5" fill="#ffd76b"/>
+  <rect x="22" y="60" width="6" height="8" rx="2" fill="#e2574e"/>
+  <path d="M50 98 Q50 78 74 78 Q98 78 98 98 Z" fill="#8ba3b6"/>
+  <path d="M172 98 Q172 78 196 78 Q220 78 220 98 Z" fill="#8ba3b6"/>
+  <g><circle cx="74" cy="102" r="20" fill="#2a333c"/><circle cx="74" cy="102" r="10.4" fill="#c9d7e2"/><circle cx="74" cy="102" r="4" fill="#2a333c"/></g>
+  <g><circle cx="196" cy="102" r="20" fill="#2a333c"/><circle cx="196" cy="102" r="10.4" fill="#c9d7e2"/><circle cx="196" cy="102" r="4" fill="#2a333c"/></g>
 </svg>
