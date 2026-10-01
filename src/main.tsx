@@ -10,6 +10,8 @@ import{Badge}from'@/components/ui/badge';
 import{Input,Select}from'@/components/ui/input';
 import{SeatSelection}from'@/features/seats/SeatSelection';
 import type{VehicleType}from'@/features/seats/seatMaps';
+import{CoachSeatModal}from'@/features/seats/CoachSeatModal';
+import type{CoachVehicleType}from'@/features/seats/coachSeatMap';
 
 type State='available'|'held'|'taken'|'unavailable';
 type Vehicle={id:string;kind:string;short:string;capacity:number;time:string;fare:number;remaining:number;pickup:string;duration:string;plate:string;driver:string;layout:'taxi'|'shuttle'|'coaster'|'coach'|'premium';amenities:string[];seats:Record<string,State>};
@@ -26,7 +28,7 @@ const SectionHead=({eyebrow,title,sub}:{eyebrow:string;title:React.ReactNode;sub
 
 function Bg(){return <div aria-hidden className="fixed inset-0 -z-10 overflow-hidden pointer-events-none"><div className="absolute -top-24 -left-24 w-[38rem] h-[38rem] rounded-full bg-brand-300/30 blur-3xl animate-blob"/><div className="absolute top-1/3 -right-32 w-[34rem] h-[34rem] rounded-full bg-rose-500/20 blur-3xl animate-blob" style={{animationDelay:'-6s'}}/><div className="absolute bottom-0 left-1/4 w-[30rem] h-[30rem] rounded-full bg-gold-500/20 blur-3xl animate-blob" style={{animationDelay:'-11s'}}/></div>}
 
-const NAV=[{label:'Book a trip',href:'/trips'},{label:'How it works',href:'/#how'},{label:'Routes',href:'/#routes'},{label:'Safety',href:'/#safety'},{label:'My trips',href:'/my-trips'}];
+const NAV=[{label:'Book a trip',href:'/trips'},{label:'How it works',href:'/#how'},{label:'Routes',href:'/#routes'},{label:'Safety',href:'/#safety'},{label:'Seat picker',href:'/coachseats'},{label:'My trips',href:'/my-trips'}];
 const Brand=({onClick,light}:{onClick:()=>void;light?:boolean})=><button onClick={onClick} className={'flex items-center gap-2.5 font-bold text-[22px] tracking-tight '+(light?'text-cream':'text-cocoa')}><span className="grid place-items-center size-8 rounded-xl bg-gradient-to-br from-brand-400 to-clay-600 text-white font-[Newsreader] text-2xl shadow-lg shadow-brand-500/30">t</span>Twendex</button>;
 
 function Header({go}:{go:(x:string)=>void}){const[open,setOpen]=useState(false);const[solid,setSolid]=useState(false);useEffect(()=>{let f=()=>setSolid(scrollY>12);f();addEventListener('scroll',f,{passive:true});return()=>removeEventListener('scroll',f)},[]);const nav=(href:string)=>{setOpen(false);if(href.startsWith('/#')){go('/');requestAnimationFrame(()=>document.getElementById(href.slice(2))?.scrollIntoView({behavior:'smooth'}))}else go(href)};return <>
@@ -261,6 +263,37 @@ function Safety({go}:{go:(x:string)=>void}){const[sos,setSos]=useState(false);re
 {sos&&<div className="fixed inset-0 z-50 grid place-items-center p-5 bg-cocoa-deep/70 backdrop-blur-sm"><Card variant="strong" className="relative max-w-md w-full p-8"><button className="absolute right-4 top-3 text-2xl text-muted" onClick={()=>setSos(false)}>×</button><div className="grid place-items-center size-[70px] rounded-full bg-rose-500/15 text-rose-500 [&_svg]:size-8"><Phone/></div><h2 className="text-3xl font-semibold text-cocoa mt-4 mb-2">Send SOS?</h2><p className="text-muted leading-relaxed">This shares your trip and vehicle details with Twendex support. For immediate danger, call local emergency services first.</p><Button variant="destructive" className="w-full mt-5" onClick={()=>setSos(false)}>Send SOS alert</Button></Card></div>}
 </main>}
 
-function SeatDemo({go}:{go:(x:string)=>void}){const[vt,setVt]=useState<VehicleType>('coaster-29');const fare=vt==='hiace-14'?12000:15000;return <main><div className="mx-auto w-full max-w-lg px-4 pt-6"><Button variant="ghost" size="sm" className="-ml-2 text-brand-700" onClick={()=>go('/')}><ArrowLeft/>Home</Button><div className="mt-3 flex gap-2">{([['coaster-29','Coaster · 29'],['hiace-14','Hiace · 14']] as [VehicleType,string][]).map(([id,lbl])=><button key={id} onClick={()=>setVt(id)} className={'rounded-xl px-4 py-2 text-sm font-bold transition '+(vt===id?'bg-[#E8622C] text-white':'border border-[#f0c3ab] bg-white text-[#a35a37]')}>{lbl}</button>)}</div></div><SeatSelection key={vt} vehicleType={vt} pricePerSeat={fare} seatsToBook={3} onContinue={s=>alert('Continue with seats: '+s.join(', '))}/></main>}
-function App(){let{p,go}=useRoute(),id=p.split('/')[2],v=vehicles.find(x=>x.id===id)||vehicles[0],q=new URLSearchParams(location.search);let page=p==='/'?<Search go={go}/>:p==='/trips'?<Trips go={go}/>:p.startsWith('/trips/')?<Detail v={v} go={go}/>:p.startsWith('/book/')?<Seats v={v} go={go}/>:p==='/seatdemo'?<SeatDemo go={go}/>:p==='/checkout'?<Checkout v={vehicles.find(x=>x.id===q.get('trip'))||vehicles[0]} sel={q.get('seat')||''} go={go}/>:p.startsWith('/payment')?<Payment go={go}/>:p.startsWith('/tickets')?<TicketView go={go}/>:p==='/my-trips'?<MyTrips go={go}/>:p.startsWith('/safety')?<Safety go={go}/>:<Search go={go}/>;const hideFooter=p.startsWith('/book/')||p==='/checkout'||p.startsWith('/payment')||p.startsWith('/safety')||p==='/seatdemo';return <><Bg/><Header go={go}/>{page}{!hideFooter&&<Footer go={go}/>}</>}
+function SeatDemo({go}:{go:(x:string)=>void}){const[vt,setVt]=useState<VehicleType>('coaster-29');const fare=vt==='hiace-14'?12000:15000;return <main><div className="mx-auto w-full max-w-lg px-4 pt-6"><Button variant="ghost" size="sm" className="-ml-2 text-brand-700" onClick={()=>go('/')}><ArrowLeft/>Home</Button><div className="mt-3 mb-4 flex flex-wrap gap-2">{([['coaster-29','Coaster · 29'],['hiace-14','Hiace · 14']] as [VehicleType,string][]).map(([id,lbl])=><button key={id} onClick={()=>setVt(id)} className={'rounded-xl px-4 py-2 text-sm font-bold transition '+(vt===id?'bg-[#E8622C] text-white':'border border-[#f0c3ab] bg-white text-[#a35a37]')}>{lbl}</button>)}</div><button onClick={()=>go('/coachseats')} className="flex items-center gap-2 rounded-xl border border-[#f0c3ab] bg-white px-4 py-2.5 text-sm font-bold text-[#E8622C] hover:bg-[#fbe7d8] transition"><Armchair className="size-4"/>Open 2+2 Coach Seat Modal →</button></div><SeatSelection key={vt} vehicleType={vt} pricePerSeat={fare} seatsToBook={3} onContinue={s=>alert('Continue with seats: '+s.join(', '))}/></main>}
+
+/* ── Coach seats full-page demo ── */
+function CoachSeatsPage({go}:{go:(x:string)=>void}){
+  const[vt,setVt]=useState<CoachVehicleType>('coaster-29');
+  const[open,setOpen]=useState(true);
+  const TYPES:[CoachVehicleType,string][]=[['coaster-29','Coaster · 29'],['coach-36','Coach · 36']];
+  return <main className="min-h-screen bg-[#FDF3EA]">
+    <div className="mx-auto max-w-2xl px-4 pt-8 pb-32">
+      <Button variant="ghost" size="sm" className="-ml-2 mb-6 text-brand-700" onClick={()=>go('/')}><ArrowLeft/>Home</Button>
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#E8622C] mb-1">Coach Seat Selection</p>
+      <h1 className="font-serif text-3xl font-semibold tracking-tight text-[#3a2416] mb-2">2+2 Layout Modal</h1>
+      <p className="text-sm text-[#8a6f5c] mb-6">Tavler.africa-style seat picker with VIP / BClass / Normal tiers, boarding &amp; dropping points, and a live running total.</p>
+      <div className="mb-6 flex flex-wrap gap-2">
+        {TYPES.map(([id,lbl])=><button key={id} onClick={()=>{setVt(id);setOpen(true)}} className={'rounded-xl px-4 py-2 text-sm font-bold transition '+(vt===id&&open?'bg-[#E8622C] text-white':'border border-[#f0c3ab] bg-white text-[#a35a37] hover:bg-[#fbe7d8]')}>{lbl}</button>)}
+      </div>
+      <button onClick={()=>setOpen(true)} className="inline-flex items-center gap-2.5 rounded-2xl bg-[#E8622C] px-6 py-3.5 text-base font-bold text-white shadow-lg shadow-[#E8622C]/30 hover:bg-[#c94f1f] transition-all hover:-translate-y-0.5 active:scale-95"><Armchair className="size-5"/>Open seat selection<ArrowRight className="size-5"/></button>
+      <div className="mt-8 rounded-2xl border border-[#f4d9c6] bg-white p-5 text-sm text-[#6b5546]">
+        <p className="font-bold text-[#3a2416] mb-3">Layout notes</p>
+        <ul className="grid gap-1.5 list-disc list-inside">
+          <li>Seats numbered left→right, front→back (row 1 = 1,2,3,4)</li>
+          <li>Rows 1–2: <span className="font-bold text-[#E8622C]">VIP</span> · Rows 3–4: <span className="font-bold text-green-600">BClass</span> · Rows 5+: <span className="font-bold text-blue-600">Normal</span></li>
+          <li>Final row renders as a full-width rear bench with no aisle gap</li>
+          <li>DOOR cutout shown beside row 1 on the left</li>
+          <li>Proceed &amp; Book activates only when ≥1 seat + both points selected</li>
+        </ul>
+      </div>
+    </div>
+    {open&&<CoachSeatModal vehicleType={vt} onClose={()=>setOpen(false)} onBook={({seats,boardingPointId,droppingPointId,total})=>{setOpen(false);alert(`Booked seats ${seats.map(s=>s.number).join(', ')} | ${boardingPointId} → ${droppingPointId} | UGX ${total.toLocaleString()}`)}}/>}
+  </main>
+}
+
+function App(){let{p,go}=useRoute(),id=p.split('/')[2],v=vehicles.find(x=>x.id===id)||vehicles[0],q=new URLSearchParams(location.search);let page=p==='/'?<Search go={go}/>:p==='/trips'?<Trips go={go}/>:p.startsWith('/trips/')?<Detail v={v} go={go}/>:p.startsWith('/book/')?<Seats v={v} go={go}/>:p==='/seatdemo'?<SeatDemo go={go}/>:p==='/coachseats'?<CoachSeatsPage go={go}/>:p==='/checkout'?<Checkout v={vehicles.find(x=>x.id===q.get('trip'))||vehicles[0]} sel={q.get('seat')||''} go={go}/>:p.startsWith('/payment')?<Payment go={go}/>:p.startsWith('/tickets')?<TicketView go={go}/>:p==='/my-trips'?<MyTrips go={go}/>:p.startsWith('/safety')?<Safety go={go}/>:<Search go={go}/>;const hideFooter=p.startsWith('/book/')||p==='/checkout'||p.startsWith('/payment')||p.startsWith('/safety')||p==='/seatdemo'||p==='/coachseats';return <><Bg/><Header go={go}/>{page}{!hideFooter&&<Footer go={go}/>}</>}
 createRoot(document.getElementById('root')!).render(<App/>);
