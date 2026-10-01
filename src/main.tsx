@@ -12,6 +12,8 @@ import{SeatSelection}from'@/features/seats/SeatSelection';
 import type{VehicleType}from'@/features/seats/seatMaps';
 import{CoachSeatModal}from'@/features/seats/CoachSeatModal';
 import type{CoachVehicleType}from'@/features/seats/coachSeatMap';
+import{PaymentScreen}from'@/features/payment/PaymentScreen';
+import type{BookingContext}from'@/features/payment/PaymentScreen';
 
 type State='available'|'held'|'taken'|'unavailable';
 type Vehicle={id:string;kind:string;short:string;capacity:number;time:string;fare:number;remaining:number;pickup:string;duration:string;plate:string;driver:string;layout:'taxi'|'shuttle'|'coaster'|'coach'|'premium';amenities:string[];seats:Record<string,State>};
@@ -241,7 +243,7 @@ const rows=(v:Vehicle)=>v.layout==='taxi'?[['1','2'],['3','4','5'],['6','7','8']
 function Seat({n,v,sel,set}:{n:string;v:Vehicle;sel:string;set:(x:string)=>void}){let x=sel===n?'selected':v.seats[n];let ic=x==='selected'?<Check/>:x==='held'?<Timer/>:x==='taken'?<Lock/>:x==='unavailable'?<Users/>:null;return <button disabled={v.seats[n]!=='available'} onClick={()=>set(n)} className={'seat '+x}><i/><b>{n}</b>{ic}<small>{x==='available'?'Available':x}</small></button>}
 function Cabin({v,sel,set}:{v:Vehicle;sel:string;set:(x:string)=>void}){return <section className={'cabin glass '+v.layout}><div className="front-label">Front of vehicle</div><div className="cabin-head"><div className="driver">Driver <Bus/></div><div className="windshield">WINDSCREEN</div><div className="entry"><DoorOpen/>Entrance</div></div>{v.layout!=='taxi'&&<div className="luggage"><Luggage/>Luggage area</div>}<div className="windows left">WINDOWS</div><div className="windows right">WINDOWS</div><div className="cabin-rows">{rows(v).map((r,i)=><div className="seat-row" key={i}><label>Row {i+1}</label><div>{r.slice(0,Math.ceil(r.length/2)).map(n=><Seat key={n} n={n} v={v} sel={sel} set={set}/>)}</div><em>Aisle</em><div>{r.slice(Math.ceil(r.length/2)).map(n=><Seat key={n} n={n} v={v} sel={sel} set={set}/>)}</div></div>)}</div><div className="rear-label">Rear seats</div></section>}
 function Legend(){return <div className="flex gap-3 flex-wrap my-5 text-xs">{[['available','Available',<Users/>],['selected','Selected',<Check/>],['held','Temporarily held',<Timer/>],['taken','Taken',<Lock/>],['unavailable','Unavailable',<Users/>]].map((s:any)=><span key={s[0]} className="flex items-center gap-1.5 [&_svg]:size-3.5"><i className={'seat-swatch size-3.5 rounded border '+(s[0]==='available'?'bg-brand-100 border-brand-400':s[0]==='selected'?'bg-brand-600 border-brand-600':s[0]==='held'?'bg-amber-100 border-amber-500':'bg-cocoa/10 border-cocoa/25')}/>{s[2]}{s[1]}</span>)}</div>}
-function Summary({v,sel,go}:{v:Vehicle;sel:string;go:(x:string)=>void}){return <Card variant="strong" className="p-6 lg:sticky lg:top-4"><Eyebrow>Booking summary</Eyebrow><b className="text-cocoa">Entebbe → Kampala</b><p className="text-[13px] text-muted leading-relaxed my-2 [&_svg]:size-3.5 [&_svg]:inline [&_svg]:-mt-0.5 [&_svg]:text-brand-500"><MapPin/> Boarding: {v.pickup}<br/><MapPin/> Drop-off: Namboole, Kampala</p><hr className="border-brand-100 my-4"/><p className="text-sm">Seat <b className="text-cocoa">{sel||'Not selected'}</b></p><div className="flex items-center justify-between my-4"><span className="text-muted">Total</span><b className="text-xl text-cocoa">{money(v.fare)}</b></div><Button className="w-full" disabled={!sel} onClick={()=>go(`/checkout?trip=${v.id}&seat=${sel}`)}>Continue to payment <ChevronRight/></Button></Card>}
+function Summary({v,sel,go}:{v:Vehicle;sel:string;go:(x:string)=>void}){return <Card variant="strong" className="p-6 lg:sticky lg:top-4"><Eyebrow>Booking summary</Eyebrow><b className="text-cocoa">Entebbe → Kampala</b><p className="text-[13px] text-muted leading-relaxed my-2 [&_svg]:size-3.5 [&_svg]:inline [&_svg]:-mt-0.5 [&_svg]:text-brand-500"><MapPin/> Boarding: {v.pickup}<br/><MapPin/> Drop-off: Namboole, Kampala</p><hr className="border-brand-100 my-4"/><p className="text-sm">Seat <b className="text-cocoa">{sel||'Not selected'}</b></p><div className="flex items-center justify-between my-4"><span className="text-muted">Total</span><b className="text-xl text-cocoa">{money(v.fare)}</b></div><Button className="w-full" disabled={!sel} onClick={()=>go(`/pay?trip=${v.id}&seats=${sel}`)}>Continue to payment <ChevronRight/></Button></Card>}
 function Seats({v,go}:{v:Vehicle;go:(x:string)=>void}){const[sel,set]=useState('');const[sec,setSec]=useState(582);useEffect(()=>{let t=setInterval(()=>setSec(s=>Math.max(0,s-1)),1000);return()=>clearInterval(t)},[]);let tm=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;return <main className="max-w-6xl mx-auto px-[5%] py-10"><Button variant="ghost" size="sm" className="mb-5 -ml-2 text-brand-700" onClick={()=>go('/trips/'+v.id)}><ArrowLeft/>Vehicle details</Button><Steps n={3}/><div className="grid lg:grid-cols-[minmax(0,1fr)_315px] gap-9 items-start"><div><Eyebrow>{v.kind}</Eyebrow><h1 className="text-[clamp(30px,5vw,48px)] font-semibold tracking-tight text-cocoa">Choose your seat</h1><div className="flex gap-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 my-4"><Timer className="size-5 shrink-0"/><div className="text-[13px]"><b>Your seat is reserved for {tm}</b><br/><span>Select a seat and complete payment before this hold expires.</span></div></div><Legend/><Cabin v={v} sel={sel} set={set}/></div><Summary v={v} sel={sel} go={go}/></div></main>}
 
 /* ---------- checkout ---------- */
@@ -263,6 +265,36 @@ function Safety({go}:{go:(x:string)=>void}){const[sos,setSos]=useState(false);re
 {sos&&<div className="fixed inset-0 z-50 grid place-items-center p-5 bg-cocoa-deep/70 backdrop-blur-sm"><Card variant="strong" className="relative max-w-md w-full p-8"><button className="absolute right-4 top-3 text-2xl text-muted" onClick={()=>setSos(false)}>×</button><div className="grid place-items-center size-[70px] rounded-full bg-rose-500/15 text-rose-500 [&_svg]:size-8"><Phone/></div><h2 className="text-3xl font-semibold text-cocoa mt-4 mb-2">Send SOS?</h2><p className="text-muted leading-relaxed">This shares your trip and vehicle details with Twendex support. For immediate danger, call local emergency services first.</p><Button variant="destructive" className="w-full mt-5" onClick={()=>setSos(false)}>Send SOS alert</Button></Card></div>}
 </main>}
 
+/* ── Full Payment screen (step 4 of 4) ── */
+function PayPage({go}:{go:(x:string)=>void}){
+  const q=new URLSearchParams(location.search);
+  const vid=q.get('trip')||'coaster';
+  const seatsParam=q.get('seats')||'4,5';
+  const v=vehicles.find(x=>x.id===vid)||vehicles[2];
+  const seatList=seatsParam.split(',').filter(Boolean);
+  const booking:BookingContext={
+    bookingId:'BK-'+Math.random().toString(36).slice(2,8).toUpperCase(),
+    vehicleLabel:`${v.short} · ${v.capacity} seats`,
+    operator:v.driver,
+    origin:'Entebbe',
+    destination:'Kampala · Namboole',
+    departureDate:'Tue 22 Sep 2026',
+    departureTime:v.time,
+    seats:seatList,
+    boardingPoint:v.pickup,
+    droppingPoint:'Namboole, Kampala',
+    baseFare:v.fare,
+    serviceFee:1500,
+  };
+  return <PaymentScreen
+    booking={booking}
+    passengerName="Amina Nakato"
+    passengerPhone="0772 123 456"
+    onBack={()=>go('/book/'+vid+'/seats')}
+    onSuccess={(ref)=>{cacheTicket({id:ref,ticketSignature:'twendex:v1:'+ref,cachedAt:new Date().toISOString(),payload:{trip:v}}).catch(()=>{});go('/tickets/'+ref)}}
+    onHome={()=>go('/')}
+  />;
+}
 function SeatDemo({go}:{go:(x:string)=>void}){const[vt,setVt]=useState<VehicleType>('coaster-29');const fare=vt==='hiace-14'?12000:15000;return <main><div className="mx-auto w-full max-w-lg px-4 pt-6"><Button variant="ghost" size="sm" className="-ml-2 text-brand-700" onClick={()=>go('/')}><ArrowLeft/>Home</Button><div className="mt-3 mb-4 flex flex-wrap gap-2">{([['coaster-29','Coaster · 29'],['hiace-14','Hiace · 14']] as [VehicleType,string][]).map(([id,lbl])=><button key={id} onClick={()=>setVt(id)} className={'rounded-xl px-4 py-2 text-sm font-bold transition '+(vt===id?'bg-[#E8622C] text-white':'border border-[#f0c3ab] bg-white text-[#a35a37]')}>{lbl}</button>)}</div><button onClick={()=>go('/coachseats')} className="flex items-center gap-2 rounded-xl border border-[#f0c3ab] bg-white px-4 py-2.5 text-sm font-bold text-[#E8622C] hover:bg-[#fbe7d8] transition"><Armchair className="size-4"/>Open 2+2 Coach Seat Modal →</button></div><SeatSelection key={vt} vehicleType={vt} pricePerSeat={fare} seatsToBook={3} onContinue={s=>alert('Continue with seats: '+s.join(', '))}/></main>}
 
 /* ── Coach seats full-page demo ── */
@@ -295,5 +327,5 @@ function CoachSeatsPage({go}:{go:(x:string)=>void}){
   </main>
 }
 
-function App(){let{p,go}=useRoute(),id=p.split('/')[2],v=vehicles.find(x=>x.id===id)||vehicles[0],q=new URLSearchParams(location.search);let page=p==='/'?<Search go={go}/>:p==='/trips'?<Trips go={go}/>:p.startsWith('/trips/')?<Detail v={v} go={go}/>:p.startsWith('/book/')?<Seats v={v} go={go}/>:p==='/seatdemo'?<SeatDemo go={go}/>:p==='/coachseats'?<CoachSeatsPage go={go}/>:p==='/checkout'?<Checkout v={vehicles.find(x=>x.id===q.get('trip'))||vehicles[0]} sel={q.get('seat')||''} go={go}/>:p.startsWith('/payment')?<Payment go={go}/>:p.startsWith('/tickets')?<TicketView go={go}/>:p==='/my-trips'?<MyTrips go={go}/>:p.startsWith('/safety')?<Safety go={go}/>:<Search go={go}/>;const hideFooter=p.startsWith('/book/')||p==='/checkout'||p.startsWith('/payment')||p.startsWith('/safety')||p==='/seatdemo'||p==='/coachseats';return <><Bg/><Header go={go}/>{page}{!hideFooter&&<Footer go={go}/>}</>}
+function App(){let{p,go}=useRoute(),id=p.split('/')[2],v=vehicles.find(x=>x.id===id)||vehicles[0],q=new URLSearchParams(location.search);let page=p==='/'?<Search go={go}/>:p==='/trips'?<Trips go={go}/>:p.startsWith('/trips/')?<Detail v={v} go={go}/>:p.startsWith('/book/')?<Seats v={v} go={go}/>:p==='/seatdemo'?<SeatDemo go={go}/>:p==='/coachseats'?<CoachSeatsPage go={go}/>:p==='/pay'?<PayPage go={go}/>:p==='/checkout'?<Checkout v={vehicles.find(x=>x.id===q.get('trip'))||vehicles[0]} sel={q.get('seat')||''} go={go}/>:p.startsWith('/payment')?<Payment go={go}/>:p.startsWith('/tickets')?<TicketView go={go}/>:p==='/my-trips'?<MyTrips go={go}/>:p.startsWith('/safety')?<Safety go={go}/>:<Search go={go}/>;const hideFooter=p.startsWith('/book/')||p==='/checkout'||p.startsWith('/payment')||p.startsWith('/safety')||p==='/seatdemo'||p==='/coachseats'||p==='/pay';return <><Bg/><Header go={go}/>{page}{!hideFooter&&<Footer go={go}/>}</>}
 createRoot(document.getElementById('root')!).render(<App/>);
